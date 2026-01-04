@@ -1,0 +1,54 @@
+[workspace]
+resolver = "3"
+members = ["crates/*"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+# repository = "@repository@"
+
+[workspace.dependencies]
+anyhow = "1.0"
+
+# Bevy (bleeding edge)
+bevy = { git = "https://github.com/bevyengine/bevy.git", default-features = false, features = [
+	"bevy_asset",
+	"bevy_camera",
+	"bevy_color",
+	"bevy_core_pipeline",
+	"bevy_gizmos",
+	"bevy_log",
+	"bevy_mesh",
+	"bevy_pbr",
+	"bevy_render",
+	"bevy_state",
+	"bevy_window",
+	"bevy_winit",
+	"hdr",
+	"multi_threaded",
+	"png",
+	"reflect_auto_register",
+	"tonemapping_luts",
+	"x11",
+	"wayland",
+	"zstd_rust",
+] }
+clap = { version = "4", features = ["derive"] }
+crossbeam-channel = "0.5"
+image = "0.25"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"
+tokio = { version = "1", features = ["full"] }
+tracing = "0.1"
+tracing-subscriber = "0.3"
+
+[profile.dev]
+opt-level = 1
+
+[profile.dev.package."*"]
+opt-level = 3
+
+[profile.release]
+lto = "thin"
