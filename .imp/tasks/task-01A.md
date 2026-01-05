@@ -98,14 +98,14 @@ main/
 
 **Tasks**:
 
-- [ ] 1.1 Create `crates/core/src/ocean/mod.rs` - Ocean plugin that registers systems and resources
-- [ ] 1.2 Create `crates/core/src/ocean/mesh.rs` - Projected grid mesh generator
+- [x] 1.1 Create `crates/core/src/ocean/mod.rs` - Ocean plugin that registers systems and resources
+- [x] 1.2 Create `crates/core/src/ocean/mesh.rs` - Projected grid mesh generator
   - Generate a grid of vertices in clip-space (-1 to 1)
   - Project each vertex ray from camera onto y=0 plane
   - Handle horizon edge cases (rays parallel to plane)
   - Mesh should be ~128x128 or configurable resolution
   - Regenerate mesh each frame based on camera transform
-- [ ] 1.3 Create `examples/01_flat_ocean.rs`
+- [x] 1.3 Create `examples/01_flat_ocean.rs`
   - Spawn ocean with basic blue `StandardMaterial`
   - Camera at height 10-20 looking at horizon
   - Verify: flat blue plane extending to horizon

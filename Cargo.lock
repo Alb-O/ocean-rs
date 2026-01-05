@@ -3078,6 +3078,7 @@ name = "ocean-core"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "bevy",
  "thiserror 2.0.17",
 ]
 
@@ -3088,6 +3089,7 @@ dependencies = [
  "bevy",
  "crossbeam-channel",
  "image",
+ "ocean-core",
 ]
 
 [[package]]

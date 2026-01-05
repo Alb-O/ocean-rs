@@ -1,15 +1,5 @@
-//! Core library crate.
+//! Core library crate for ocean rendering.
 
-pub fn hello() -> &'static str {
-	"Hello from core!"
-}
+pub mod ocean;
 
-#[cfg(test)]
-mod tests {
-	use super::*;
-
-	#[test]
-	fn test_hello() {
-		assert_eq!(hello(), "Hello from core!");
-	}
-}
+pub use ocean::{OceanMesh, OceanMeshConfig, OceanPlugin, ProjectedGridConfig};
