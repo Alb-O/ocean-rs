@@ -56,6 +56,10 @@ pub struct OceanUniforms {
 	pub deep_color: LinearRgba,
 	/// Shallow water color (viewed at angle).
 	pub shallow_color: LinearRgba,
+	/// Fresnel parameters: x: F0 (base reflectance), y: power, z: bias, w: unused.
+	pub fresnel_params: Vec4,
+	/// Sky/reflection color placeholder (until environment maps are added).
+	pub sky_color: LinearRgba,
 }
 
 impl Default for OceanUniforms {
@@ -65,6 +69,9 @@ impl Default for OceanUniforms {
 			time_and_config: Vec4::new(0.0, 1.0, 0.0, 0.0),
 			deep_color: LinearRgba::new(0.0, 0.1, 0.3, 1.0),
 			shallow_color: LinearRgba::new(0.0, 0.4, 0.5, 1.0),
+			// F0 for water ≈ 0.02, power = 5.0 (standard Schlick), bias = 0.0
+			fresnel_params: Vec4::new(0.02, 5.0, 0.0, 0.0),
+			sky_color: LinearRgba::new(0.5, 0.7, 0.9, 1.0),
 		}
 	}
 }
@@ -102,13 +109,41 @@ impl OceanMaterial {
 				time_and_config: Vec4::new(0.0, wave_count as f32, 0.0, 0.0),
 				deep_color: deep_color.to_linear(),
 				shallow_color: shallow_color.to_linear(),
+				..Default::default()
 			},
 		}
+	}
+
+	/// Creates a new ocean material with Fresnel parameters.
+	#[must_use]
+	pub fn with_fresnel(
+		waves: &[GerstnerWave],
+		deep_color: Color,
+		shallow_color: Color,
+		sky_color: Color,
+		fresnel_f0: f32,
+		fresnel_power: f32,
+		fresnel_bias: f32,
+	) -> Self {
+		let mut material = Self::new(waves, deep_color, shallow_color);
+		material.uniforms.fresnel_params = Vec4::new(fresnel_f0, fresnel_power, fresnel_bias, 0.0);
+		material.uniforms.sky_color = sky_color.to_linear();
+		material
 	}
 
 	/// Updates the time uniform for wave animation.
 	pub fn set_time(&mut self, time: f32) {
 		self.uniforms.time_and_config.x = time;
+	}
+
+	/// Sets the Fresnel parameters.
+	pub fn set_fresnel(&mut self, f0: f32, power: f32, bias: f32) {
+		self.uniforms.fresnel_params = Vec4::new(f0, power, bias, 0.0);
+	}
+
+	/// Sets the sky/reflection color placeholder.
+	pub fn set_sky_color(&mut self, color: Color) {
+		self.uniforms.sky_color = color.to_linear();
 	}
 }
 

@@ -22,3 +22,6 @@ name = "02_gerstner_single"
 
 [[example]]
 name = "03_gerstner_multi"
+
+[[example]]
+name = "04_fresnel"

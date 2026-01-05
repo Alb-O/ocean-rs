@@ -1,12 +1,15 @@
-// Ocean surface shader with Gerstner wave displacement.
+// Ocean surface shader with Gerstner wave displacement and Fresnel shading.
 //
 // This shader displaces vertices using Gerstner waves in the vertex stage
-// and applies basic shading in the fragment stage.
+// and applies Fresnel-based reflection/refraction blending in the fragment stage.
 
 #import bevy_pbr::{
     mesh_functions,
     view_transformations::position_world_to_clip,
 }
+#import bevy_render::view::View
+
+@group(0) @binding(0) var<uniform> view: View;
 
 // Gerstner wave parameters - up to 4 waves
 struct GerstnerWave {
@@ -22,6 +25,9 @@ struct OceanUniforms {
     time_and_config: vec4<f32>,
     deep_color: vec4<f32>,
     shallow_color: vec4<f32>,
+    // x: F0 (base reflectance), y: power, z: bias, w: unused
+    fresnel_params: vec4<f32>,
+    sky_color: vec4<f32>,
 }
 
 @group(2) @binding(0) var<uniform> ocean: OceanUniforms;
@@ -168,23 +174,51 @@ fn vertex(vertex: Vertex) -> VertexOutput {
     return out;
 }
 
+// Schlick's Fresnel approximation
+// F = F0 + (1 - F0) * (1 - cos_theta)^power
+fn fresnel_schlick(cos_theta: f32, f0: f32, power: f32, bias: f32) -> f32 {
+    let base = 1.0 - saturate(cos_theta);
+    return clamp(f0 + (1.0 - f0) * pow(base, power) + bias, 0.0, 1.0);
+}
+
 @fragment
 fn fragment(in: VertexOutput) -> @location(0) vec4<f32> {
-    // Simple shading based on normal - will be enhanced in later phases
     let light_dir = normalize(vec3<f32>(0.5, 1.0, 0.3));
     let n = normalize(in.world_normal);
     
+    // Calculate view direction from camera position
+    let camera_pos = view.world_position;
+    let view_dir = normalize(camera_pos - in.world_position);
+    
+    // Fresnel calculation - how much reflection vs water color
+    let n_dot_v = max(dot(n, view_dir), 0.0);
+    let f0 = ocean.fresnel_params.x;
+    let power = ocean.fresnel_params.y;
+    let bias = ocean.fresnel_params.z;
+    let fresnel = fresnel_schlick(n_dot_v, f0, power, bias);
+    
     // Basic diffuse lighting
-    let ndotl = max(dot(n, light_dir), 0.0);
+    let n_dot_l = max(dot(n, light_dir), 0.0);
     
-    // Blend between deep and shallow based on surface angle
-    // (simple approximation until Fresnel is implemented)
-    let up_factor = max(dot(n, vec3<f32>(0.0, 1.0, 0.0)), 0.0);
-    let base_color = mix(ocean.deep_color.rgb, ocean.shallow_color.rgb, up_factor * 0.5);
+    // Blend between deep and shallow based on view angle
+    // Water appears darker (deep) when viewed from above, lighter (shallow) at grazing angles
+    let water_color = mix(ocean.deep_color.rgb, ocean.shallow_color.rgb, 1.0 - n_dot_v);
     
-    // Apply lighting
+    // Apply lighting to water color
     let ambient = 0.3;
-    let lit_color = base_color * (ambient + (1.0 - ambient) * ndotl);
+    let lit_water = water_color * (ambient + (1.0 - ambient) * n_dot_l);
     
-    return vec4<f32>(lit_color, 1.0);
+    // Reflection direction for specular highlight
+    let reflect_dir = reflect(-view_dir, n);
+    let spec = pow(max(dot(reflect_dir, light_dir), 0.0), 64.0);
+    
+    // Sky reflection (placeholder solid color until environment maps)
+    let sky_reflection = ocean.sky_color.rgb + spec * 0.5;
+    
+    // Blend water color and reflection based on Fresnel term
+    // Higher Fresnel (grazing angles) = more reflection
+    // Lower Fresnel (looking down) = more water color
+    let final_color = mix(lit_water, sky_reflection, fresnel);
+    
+    return vec4<f32>(final_color, 1.0);
 }

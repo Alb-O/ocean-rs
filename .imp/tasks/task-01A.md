@@ -230,14 +230,14 @@ y_offset = A * sin(phase)
 
 **Tasks**:
 
-- [ ] 4.1 Add Fresnel calculation to fragment shader
+- [x] 4.1 Add Fresnel calculation to fragment shader
   ```wgsl
   fn fresnel_schlick(cos_theta: f32, F0: f32) -> f32 {
       return F0 + (1.0 - F0) * pow(1.0 - cos_theta, 5.0);
   }
   // F0 for water ≈ 0.02
   ```
-- [ ] 4.2 Add water color parameters to material
+- [x] 4.2 Add water color parameters to material
   ```rust
   pub struct OceanMaterial {
       pub deep_color: Color,      // Dark blue-green for steep viewing
@@ -246,8 +246,8 @@ y_offset = A * sin(phase)
       pub fresnel_bias: f32,      // Minimum reflection
   }
   ```
-- [ ] 4.3 Blend between water color and sky reflection placeholder (solid color for now)
-- [ ] 4.4 Create `examples/04_fresnel.rs`
+- [x] 4.3 Blend between water color and sky reflection placeholder (solid color for now)
+- [x] 4.4 Create `examples/04_fresnel.rs`
   - Show Fresnel effect with contrasting deep/shallow colors
   - Camera angles that demonstrate the effect (high and low views)
 
