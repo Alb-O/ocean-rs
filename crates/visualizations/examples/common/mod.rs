@@ -547,40 +547,18 @@ fn screenshot_sequence(
 
 fn print_agent_instructions(paths: &[String]) {
 	println!();
+	println!("=== Screenshot Verification ===");
+	println!();
 	println!(
-		"Agents: use PARALLEL READS on the {} images like so:",
+		"Agents: Read each of the {} screenshot(s) below ONE AT A TIME.",
 		paths.len()
 	);
+	println!("After reading each image, analyze what you see before proceeding to the next.");
 	println!();
-
-	let tool_uses: Vec<String> = paths
-		.iter()
-		.map(|p| {
-			format!(
-				r#"      {{
-        "recipient_name": "functions.read",
-        "parameters": {{
-          "filePath": "{}"
-        }}
-      }}"#,
-				p
-			)
-		})
-		.collect();
-
-	let json_block = format!(
-		r#"{{
-  "recipient_name": "multi_tool_use.parallel",
-  "parameters": {{
-    "tool_uses": [
-{}
-    ]
-  }}
-}}"#,
-		tool_uses.join(",\n")
-	);
-
-	println!("{}", json_block);
+	for (i, path) in paths.iter().enumerate() {
+		println!("  {}. {}", i + 1, path);
+	}
+	println!();
 }
 
 /// Plugin for copying rendered images from GPU to CPU via render graph.
