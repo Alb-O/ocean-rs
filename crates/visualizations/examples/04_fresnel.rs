@@ -77,7 +77,6 @@ fn setup_ocean(
 	ocean_config: Res<OceanConfig>,
 	camera_query: Query<(&Transform, &Projection), With<Camera3d>>,
 ) {
-	// Get camera info for initial mesh generation
 	let Ok((camera_transform, projection)) = camera_query.single() else {
 		return;
 	};
@@ -88,7 +87,6 @@ fn setup_ocean(
 		Projection::Custom(c) => c.get_clip_from_view(),
 	};
 
-	// Create initial ocean mesh
 	let mesh_config = OceanMeshConfig {
 		resolution: grid_config.resolution,
 		max_distance: grid_config.max_distance,
@@ -99,27 +97,20 @@ fn setup_ocean(
 
 	let ocean_mesh = create_projected_grid_mesh(&mesh_config);
 
-	// Use contrasting colors to clearly demonstrate Fresnel effect:
-	// - Deep color: dark blue-green (visible when looking down)
-	// - Shallow color: lighter teal (visible at medium angles)
-	// - Sky color: bright sky blue (visible at grazing angles via reflection)
-	let deep_color = Color::srgb(0.0, 0.05, 0.15); // Very dark blue
-	let shallow_color = Color::srgb(0.0, 0.3, 0.4); // Teal
-	let sky_color = Color::srgb(0.6, 0.8, 1.0); // Bright sky blue
+	let deep_color = Color::srgb(0.0, 0.05, 0.15);
+	let shallow_color = Color::srgb(0.0, 0.3, 0.4);
+	let sky_color = Color::srgb(0.6, 0.8, 1.0);
 
-	// Create ocean material with Fresnel parameters
-	// F0 for water ≈ 0.02 (standard value for water IOR ~1.33)
 	let ocean_material = OceanMaterial::with_fresnel(
 		ocean_config.active_waves(),
 		deep_color,
 		shallow_color,
 		sky_color,
-		0.02,  // F0 - base reflectance for water
-		5.0,   // power - standard Schlick exponent
-		0.0,   // bias - no additional reflection bias
+		0.02,
+		5.0,
+		0.0,
 	);
 
-	// Spawn ocean entity with custom material
 	commands.spawn((
 		Mesh3d(meshes.add(ocean_mesh)),
 		MeshMaterial3d(materials.add(ocean_material)),

@@ -103,9 +103,8 @@ impl OceanMaterial {
 			gpu_waves[i] = GpuGerstnerWave::from(wave);
 		}
 
-		// Zero out unused waves
 		for wave in gpu_waves.iter_mut().skip(wave_count) {
-			wave.params.z = 0.0; // Zero amplitude disables wave
+			wave.params.z = 0.0;
 		}
 
 		Self {
@@ -150,7 +149,6 @@ impl OceanMaterial {
 	) -> Self {
 		let mut material = Self::new(waves, deep_color, shallow_color);
 		material.uniforms.fresnel_params = Vec4::new(fresnel_f0, fresnel_power, fresnel_bias, 0.0);
-		// Set use_env_map flag (z component of time_and_config)
 		material.uniforms.time_and_config.z = 1.0;
 		material.environment_map = Some(environment_map);
 		material

@@ -55,7 +55,6 @@ fn setup_ocean(
 	config: Res<ProjectedGridConfig>,
 	camera_query: Query<(&Transform, &Projection), With<Camera3d>>,
 ) {
-	// Get camera info for initial mesh generation
 	let Ok((camera_transform, projection)) = camera_query.single() else {
 		return;
 	};
@@ -66,7 +65,6 @@ fn setup_ocean(
 		Projection::Custom(c) => c.get_clip_from_view(),
 	};
 
-	// Create initial ocean mesh
 	let mesh_config = OceanMeshConfig {
 		resolution: config.resolution,
 		max_distance: config.max_distance,
@@ -77,7 +75,6 @@ fn setup_ocean(
 
 	let ocean_mesh = create_projected_grid_mesh(&mesh_config);
 
-	// Spawn ocean entity with blue material
 	commands.spawn((
 		Mesh3d(meshes.add(ocean_mesh)),
 		MeshMaterial3d(materials.add(StandardMaterial {

@@ -84,7 +84,6 @@ fn setup_ocean(
 	ocean_config: Res<OceanConfig>,
 	camera_query: Query<(&Transform, &Projection), With<Camera3d>>,
 ) {
-	// Get camera info for initial mesh generation
 	let Ok((camera_transform, projection)) = camera_query.single() else {
 		return;
 	};
@@ -95,7 +94,6 @@ fn setup_ocean(
 		Projection::Custom(c) => c.get_clip_from_view(),
 	};
 
-	// Create initial ocean mesh
 	let mesh_config = OceanMeshConfig {
 		resolution: grid_config.resolution,
 		max_distance: grid_config.max_distance,
@@ -106,26 +104,22 @@ fn setup_ocean(
 
 	let ocean_mesh = create_projected_grid_mesh(&mesh_config);
 
-	// Load environment cubemap for reflections
 	let env_map: Handle<Image> =
 		asset_server.load("environment_maps/table_mountain_2_puresky_4k_cubemap.ktx2");
 
-	// Ocean colors - slightly more saturated for dramatic effect with env map
 	let deep_color = Color::srgb(0.0, 0.08, 0.2);
 	let shallow_color = Color::srgb(0.0, 0.35, 0.45);
 
-	// Create ocean material with environment map reflections
 	let ocean_material = OceanMaterial::with_environment_map(
 		ocean_config.active_waves(),
 		deep_color,
 		shallow_color,
-		0.02,  // F0 - base reflectance for water
-		5.0,   // power - standard Schlick exponent
-		0.0,   // bias - no additional reflection bias
+		0.02,
+		5.0,
+		0.0,
 		env_map,
 	);
 
-	// Spawn ocean entity with custom material
 	commands.spawn((
 		Mesh3d(meshes.add(ocean_mesh)),
 		MeshMaterial3d(materials.add(ocean_material)),
@@ -138,12 +132,9 @@ fn setup_ocean(
 }
 
 fn setup_ship(mut commands: Commands, asset_server: Res<AssetServer>) {
-	// Load the dutch ship model
 	let ship_scene =
 		asset_server.load(GltfAssetLabel::Scene(0).from_asset("models/dutch_ship_medium_1k/dutch_ship_medium_1k.gltf"));
 
-	// Spawn ship floating on the water
-	// Position slightly above y=0 to account for wave displacement
 	commands.spawn((
 		SceneRoot(ship_scene),
 		Transform::from_xyz(0.0, 2.0, 0.0)
@@ -157,8 +148,6 @@ fn setup_environment(
 	mut commands: Commands,
 	asset_server: Res<AssetServer>,
 ) {
-	// Add environment map light for consistent scene IBL
-	// This provides ambient lighting that matches the environment reflections
 	commands.spawn((
 		EnvironmentMapLight {
 			diffuse_map: asset_server.load("environment_maps/table_mountain_2_puresky_4k_diffuse.ktx2"),
@@ -168,7 +157,6 @@ fn setup_environment(
 		},
 	));
 
-	// Add directional light to match the environment
 	commands.spawn((
 		DirectionalLight {
 			illuminance: 12000.0,
