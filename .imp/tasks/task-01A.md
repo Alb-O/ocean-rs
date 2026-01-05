@@ -132,7 +132,7 @@ main/
 
 **Tasks**:
 
-- [ ] 2.1 Create `crates/core/src/ocean/waves.rs` - Gerstner wave math (CPU reference)
+- [x] 2.1 Create `crates/core/src/ocean/waves.rs` - Gerstner wave math (CPU reference)
   ```rust
   pub struct GerstnerWave {
       pub direction: Vec2,    // Normalized wave direction
@@ -147,12 +147,12 @@ main/
       pub fn evaluate(&self, world_xz: Vec2, time: f32) -> (Vec3, Vec3);
   }
   ```
-- [ ] 2.2 Create `crates/core/src/shaders/ocean.wgsl` with Gerstner in vertex shader
-- [ ] 2.3 Create `crates/core/src/ocean/material.rs` - Custom `OceanMaterial` impl
+- [x] 2.2 Create `crates/core/src/shaders/ocean.wgsl` with Gerstner in vertex shader
+- [x] 2.3 Create `crates/core/src/ocean/material.rs` - Custom `OceanMaterial` impl
   - Bind wave parameters as uniforms
   - Bind time uniform
   - Pass world position to vertex shader for displacement
-- [ ] 2.4 Create `examples/02_gerstner_single.rs`
+- [x] 2.4 Create `examples/02_gerstner_single.rs`
   - Single wave: wavelength=60, amplitude=2, steepness=0.5
   - Animate time via `Res<Time>`
   - Basic shading to see wave shape
@@ -183,7 +183,7 @@ y_offset = A * sin(phase)
 
 **Tasks**:
 
-- [ ] 3.1 Create `OceanConfig` resource with wave array
+- [x] 3.1 Create `OceanConfig` resource with wave array
   ```rust
   #[derive(Resource)]
   pub struct OceanConfig {
@@ -205,15 +205,15 @@ y_offset = A * sin(phase)
       }
   }
   ```
-- [ ] 3.2 Update shader to sum multiple waves in vertex shader
-- [ ] 3.3 Calculate analytical normals from wave derivatives
+- [x] 3.2 Update shader to sum multiple waves in vertex shader
+- [x] 3.3 Calculate analytical normals from wave derivatives
   ```
   // Binormal and tangent from wave derivatives:
   B = (1 - Σ(Q*k*Dx*Dx*sin), Σ(Q*k*Dx*cos), -Σ(Q*k*Dx*Dz*sin))
   T = (-Σ(Q*k*Dx*Dz*sin), Σ(Q*k*Dz*cos), 1 - Σ(Q*k*Dz*Dz*sin))
   N = normalize(cross(B, T))
   ```
-- [ ] 3.4 Create `examples/03_gerstner_multi.rs`
+- [x] 3.4 Create `examples/03_gerstner_multi.rs`
   - 3 overlapping waves
   - Better shading using calculated normals
   - Multiple camera angles to show wave complexity

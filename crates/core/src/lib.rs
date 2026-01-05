@@ -2,4 +2,7 @@
 
 pub mod ocean;
 
-pub use ocean::{OceanMesh, OceanMeshConfig, OceanPlugin, ProjectedGridConfig};
+pub use ocean::{
+	GerstnerWave, GpuGerstnerWave, OceanConfig, OceanMaterial, OceanMesh, OceanMeshConfig,
+	OceanPlugin, OceanUniforms, ProjectedGridConfig, evaluate_waves, GRAVITY, MAX_WAVES,
+};

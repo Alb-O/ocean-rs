@@ -16,3 +16,9 @@ name = "cube"
 
 [[example]]
 name = "01_flat_ocean"
+
+[[example]]
+name = "02_gerstner_single"
+
+[[example]]
+name = "03_gerstner_multi"
