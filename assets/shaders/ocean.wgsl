@@ -2,6 +2,7 @@
 //
 // This shader displaces vertices using Gerstner waves in the vertex stage
 // and applies Fresnel-based reflection/refraction blending in the fragment stage.
+// Supports optional environment cubemap for realistic sky reflections.
 
 #import bevy_pbr::{
     mesh_functions,
@@ -21,7 +22,7 @@ struct GerstnerWave {
 
 struct OceanUniforms {
     waves: array<GerstnerWave, 4>,
-    // x: time, y: active_wave_count, z: unused, w: unused
+    // x: time, y: active_wave_count, z: use_env_map (1.0 = true), w: unused
     time_and_config: vec4<f32>,
     deep_color: vec4<f32>,
     shallow_color: vec4<f32>,
@@ -31,6 +32,8 @@ struct OceanUniforms {
 }
 
 @group(2) @binding(0) var<uniform> ocean: OceanUniforms;
+@group(2) @binding(1) var env_cubemap: texture_cube<f32>;
+@group(2) @binding(2) var env_sampler: sampler;
 
 struct Vertex {
     @builtin(instance_index) instance_index: u32,
@@ -208,12 +211,24 @@ fn fragment(in: VertexOutput) -> @location(0) vec4<f32> {
     let ambient = 0.3;
     let lit_water = water_color * (ambient + (1.0 - ambient) * n_dot_l);
     
-    // Reflection direction for specular highlight
+    // Reflection direction for environment sampling
     let reflect_dir = reflect(-view_dir, n);
-    let spec = pow(max(dot(reflect_dir, light_dir), 0.0), 64.0);
     
-    // Sky reflection (placeholder solid color until environment maps)
-    let sky_reflection = ocean.sky_color.rgb + spec * 0.5;
+    // Check if we should use environment map
+    let use_env_map = ocean.time_and_config.z > 0.5;
+    
+    var sky_reflection: vec3<f32>;
+    if use_env_map {
+        // Sample environment cubemap using reflection direction
+        let env_color = textureSample(env_cubemap, env_sampler, reflect_dir).rgb;
+        // Add subtle specular highlight on top
+        let spec = pow(max(dot(reflect_dir, light_dir), 0.0), 64.0);
+        sky_reflection = env_color + spec * 0.3;
+    } else {
+        // Fallback to solid sky color with specular
+        let spec = pow(max(dot(reflect_dir, light_dir), 0.0), 64.0);
+        sky_reflection = ocean.sky_color.rgb + spec * 0.5;
+    }
     
     // Blend water color and reflection based on Fresnel term
     // Higher Fresnel (grazing angles) = more reflection

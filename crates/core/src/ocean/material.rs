@@ -50,7 +50,7 @@ impl From<&GerstnerWave> for GpuGerstnerWave {
 pub struct OceanUniforms {
 	/// Array of up to 4 Gerstner waves.
 	pub waves: [GpuGerstnerWave; MAX_WAVES],
-	/// x: time, y: active_wave_count, z: unused, w: unused.
+	/// x: time, y: active_wave_count, z: use_env_map (1.0 = true), w: unused.
 	pub time_and_config: Vec4,
 	/// Deep water color (viewed from above).
 	pub deep_color: LinearRgba,
@@ -58,7 +58,7 @@ pub struct OceanUniforms {
 	pub shallow_color: LinearRgba,
 	/// Fresnel parameters: x: F0 (base reflectance), y: power, z: bias, w: unused.
 	pub fresnel_params: Vec4,
-	/// Sky/reflection color placeholder (until environment maps are added).
+	/// Sky/reflection color placeholder (used when no environment map is set).
 	pub sky_color: LinearRgba,
 }
 
@@ -85,6 +85,11 @@ pub struct OceanMaterial {
 	/// Ocean rendering uniforms including wave data.
 	#[uniform(0)]
 	pub uniforms: OceanUniforms,
+
+	/// Environment cubemap for sky reflections.
+	#[texture(1, dimension = "cube")]
+	#[sampler(2)]
+	pub environment_map: Option<Handle<Image>>,
 }
 
 impl OceanMaterial {
@@ -111,6 +116,7 @@ impl OceanMaterial {
 				shallow_color: shallow_color.to_linear(),
 				..Default::default()
 			},
+			environment_map: None,
 		}
 	}
 
@@ -131,6 +137,25 @@ impl OceanMaterial {
 		material
 	}
 
+	/// Creates a new ocean material with environment map reflections.
+	#[must_use]
+	pub fn with_environment_map(
+		waves: &[GerstnerWave],
+		deep_color: Color,
+		shallow_color: Color,
+		fresnel_f0: f32,
+		fresnel_power: f32,
+		fresnel_bias: f32,
+		environment_map: Handle<Image>,
+	) -> Self {
+		let mut material = Self::new(waves, deep_color, shallow_color);
+		material.uniforms.fresnel_params = Vec4::new(fresnel_f0, fresnel_power, fresnel_bias, 0.0);
+		// Set use_env_map flag (z component of time_and_config)
+		material.uniforms.time_and_config.z = 1.0;
+		material.environment_map = Some(environment_map);
+		material
+	}
+
 	/// Updates the time uniform for wave animation.
 	pub fn set_time(&mut self, time: f32) {
 		self.uniforms.time_and_config.x = time;
@@ -144,6 +169,12 @@ impl OceanMaterial {
 	/// Sets the sky/reflection color placeholder.
 	pub fn set_sky_color(&mut self, color: Color) {
 		self.uniforms.sky_color = color.to_linear();
+	}
+
+	/// Sets the environment map for reflections.
+	pub fn set_environment_map(&mut self, environment_map: Handle<Image>) {
+		self.environment_map = Some(environment_map);
+		self.uniforms.time_and_config.z = 1.0;
 	}
 }
 

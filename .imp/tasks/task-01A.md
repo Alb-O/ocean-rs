@@ -263,17 +263,17 @@ y_offset = A * sin(phase)
 
 **Tasks**:
 
-- [ ] 5.1 Load environment cubemap in ocean material
-  - Use `table_mountain_2_puresky_4k_cubemap.ktx2` or `kloppenheim_01_puresky_4k_cubemap.ktx2`
-- [ ] 5.2 Sample cubemap in fragment shader using reflected view vector
+- [x] 5.1 Load environment cubemap in ocean material
+  - Use `table_mountain_2_puresky_4k_cubemap.ktx2` or `kloppenheim_01_puresky_4k_specular.ktx2`
+- [x] 5.2 Sample cubemap in fragment shader using reflected view vector
   ```wgsl
   let view_dir = normalize(camera_pos - world_pos);
   let reflect_dir = reflect(-view_dir, normal);
   let env_color = textureSample(env_cubemap, env_sampler, reflect_dir).rgb;
   ```
-- [ ] 5.3 Blend reflection with water color using Fresnel term
-- [ ] 5.4 Add `EnvironmentMapLight` for consistent scene IBL
-- [ ] 5.5 Create `examples/05_skybox_reflect.rs`
+- [x] 5.3 Blend reflection with water color using Fresnel term
+- [x] 5.4 Add `EnvironmentMapLight` for consistent scene IBL
+- [x] 5.5 Create `examples/05_skybox_reflect.rs`
   - Full integration: projected grid + 3 waves + Fresnel + env reflections
   - Spawn the dutch ship model floating on water (static, no physics)
   - Multiple dramatic camera angles

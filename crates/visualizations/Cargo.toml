@@ -25,3 +25,6 @@ name = "03_gerstner_multi"
 
 [[example]]
 name = "04_fresnel"
+
+[[example]]
+name = "05_skybox_reflect"
