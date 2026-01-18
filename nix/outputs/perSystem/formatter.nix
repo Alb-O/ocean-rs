@@ -1,17 +1,17 @@
 {
   pkgs,
   treefmt-nix,
-  imp-fmt,
+  imp-fmt-lib,
   ...
 }:
 let
-  formatterEval = imp-fmt.lib.makeEval {
+  formatterEval = imp-fmt-lib.makeEval {
     inherit pkgs treefmt-nix;
     excludes = [
       "target/*"
       "**/target/*"
     ];
-    rust.enable = true;
+    rust = true;
   };
 in
 formatterEval.config.build.wrapper
