@@ -20,6 +20,10 @@ pub const SCREENSHOT_HEIGHT: u32 = 1080;
 #[derive(Parser, Debug, Clone)]
 #[command(author, version, about = "Screenshot harness for Bevy examples")]
 pub struct CliArgs {
+	/// Run with interactive window instead of headless screenshot mode
+	#[arg(long, short = 'i')]
+	pub interactive: bool,
+
 	/// Output directory for screenshots
 	#[arg(long, short = 'o', default_value = DEFAULT_OUTPUT_DIR)]
 	pub output_dir: PathBuf,
@@ -45,9 +49,19 @@ pub struct CliArgs {
 	pub retain_sessions: usize,
 }
 
+impl CliArgs {
+	/// Parse CLI arguments (cached after first call)
+	pub fn get() -> &'static Self {
+		use std::sync::OnceLock;
+		static ARGS: OnceLock<CliArgs> = OnceLock::new();
+		ARGS.get_or_init(Self::parse)
+	}
+}
+
 impl Default for CliArgs {
 	fn default() -> Self {
 		Self {
+			interactive: false,
 			output_dir: PathBuf::from(DEFAULT_OUTPUT_DIR),
 			width: SCREENSHOT_WIDTH,
 			height: SCREENSHOT_HEIGHT,
