@@ -29,10 +29,12 @@ in
   bevy = pkgs.mkShell {
     packages = [ pkgs.pkg-config ] ++ bevyDeps;
 
-    # Required for Bevy to find Vulkan
-    LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath bevyDeps;
-
     # Enable dynamic linking for faster compile times
     RUSTFLAGS = "-C linker=clang -C link-arg=-fuse-ld=mold";
+
+    # shellHook is inherited via inputsFrom
+    shellHook = ''
+      export LD_LIBRARY_PATH="${pkgs.lib.makeLibraryPath bevyDeps}:/run/opengl-driver/lib''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+    '';
   };
 }
