@@ -7,12 +7,12 @@ mod material;
 mod mesh;
 pub mod waves;
 
-pub use material::{GpuGerstnerWave, OceanMaterial, OceanMaterialPlugin, OceanUniforms, MAX_WAVES};
+pub use material::{MAX_WAVES, OceanMaterial, OceanMaterialPlugin};
 pub use mesh::{
 	OceanMesh, OceanMeshConfig, ProjectedGridConfig, create_projected_grid_mesh,
 	update_projected_grid,
 };
-pub use waves::{GerstnerWave, evaluate_waves, GRAVITY};
+pub use waves::{GRAVITY, GerstnerWave, evaluate_waves};
 
 use bevy::prelude::*;
 

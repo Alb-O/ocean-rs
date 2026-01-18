@@ -16,7 +16,10 @@ mod systems;
 
 pub use cleanup::cleanup_old_sessions;
 pub use config::{CliArgs, ScreenshotConfig};
-pub use headless::{headless_plugins, headless_runner, interactive_plugins, is_interactive};
+pub use headless::{
+	WORKSPACE_ROOT, headless_plugins, headless_runner, interactive_plugins, is_interactive,
+	set_workspace_asset_root,
+};
 pub use plugin::{HarnessCameraReady, ScreenshotHarnessPlugin};
 pub use presets::{
 	CameraPreset, DETAIL_PRESETS, MIN_CAMERA_HEIGHT, SIMPLE_PRESETS, STANDARD_PRESETS,

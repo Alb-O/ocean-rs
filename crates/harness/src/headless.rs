@@ -13,6 +13,24 @@ use tracing_subscriber::fmt::format::FmtSpan;
 
 use crate::config::CliArgs;
 
+/// Absolute path to workspace root, computed at compile time.
+pub const WORKSPACE_ROOT: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/../..");
+
+/// Sets `BEVY_ASSET_ROOT` to the workspace root.
+///
+/// Call this before creating your App to ensure assets are loaded from the
+/// workspace's `assets/` directory regardless of which crate the example is in.
+///
+/// # Safety
+/// This modifies environment variables, which is safe when called at the start
+/// of main() before any other threads are spawned.
+pub fn set_workspace_asset_root() {
+	// SAFETY: Called at start of main before any threads are spawned
+	unsafe {
+		std::env::set_var("BEVY_ASSET_ROOT", WORKSPACE_ROOT);
+	}
+}
+
 fn log_plugin(filter: &str) -> LogPlugin {
 	LogPlugin {
 		filter: filter.to_string(),

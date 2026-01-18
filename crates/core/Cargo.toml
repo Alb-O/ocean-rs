@@ -6,5 +6,5 @@ license.workspace = true
 
 [dependencies]
 anyhow.workspace = true
-thiserror.workspace = true
 bevy.workspace = true
+thiserror.workspace = true

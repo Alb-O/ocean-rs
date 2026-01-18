@@ -13,6 +13,7 @@ use bevy::scene::SceneRoot;
 use bevy_screenshot_harness::{
 	CameraPreset, HarnessCameraReady, ScreenshotConfig, ScreenshotHarnessPlugin,
 	headless_plugins, headless_runner, interactive_plugins, is_interactive,
+	set_workspace_asset_root,
 };
 use ocean_core::{
 	OceanConfig, OceanMaterial, OceanMesh, OceanMeshConfig, OceanPlugin, ProjectedGridConfig,
@@ -64,6 +65,7 @@ struct AnimatedOcean;
 struct Ship;
 
 fn main() {
+	set_workspace_asset_root();
 	let mut app = App::new();
 
 	if is_interactive() {

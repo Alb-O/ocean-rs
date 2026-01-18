@@ -12,28 +12,22 @@
 
 @group(0) @binding(0) var<uniform> view: View;
 
-// Gerstner wave parameters - up to 4 waves
-struct GerstnerWave {
-    // xy: direction (normalized), zw: unused padding
-    direction: vec4<f32>,
-    // x: steepness, y: wavelength, z: amplitude, w: speed
-    params: vec4<f32>,
-}
-
-struct OceanUniforms {
-    waves: array<GerstnerWave, 4>,
-    // x: time, y: active_wave_count, z: use_env_map (1.0 = true), w: unused
-    time_and_config: vec4<f32>,
-    deep_color: vec4<f32>,
-    shallow_color: vec4<f32>,
-    // x: F0 (base reflectance), y: power, z: bias, w: unused
-    fresnel_params: vec4<f32>,
-    sky_color: vec4<f32>,
-}
-
-@group(2) @binding(0) var<uniform> ocean: OceanUniforms;
-@group(2) @binding(1) var env_cubemap: texture_cube<f32>;
-@group(2) @binding(2) var env_sampler: sampler;
+// Individual uniform bindings for each field
+@group(2) @binding(0) var<uniform> wave0_direction: vec4<f32>;
+@group(2) @binding(1) var<uniform> wave0_params: vec4<f32>;
+@group(2) @binding(2) var<uniform> wave1_direction: vec4<f32>;
+@group(2) @binding(3) var<uniform> wave1_params: vec4<f32>;
+@group(2) @binding(4) var<uniform> wave2_direction: vec4<f32>;
+@group(2) @binding(5) var<uniform> wave2_params: vec4<f32>;
+@group(2) @binding(6) var<uniform> wave3_direction: vec4<f32>;
+@group(2) @binding(7) var<uniform> wave3_params: vec4<f32>;
+@group(2) @binding(8) var<uniform> time_and_config: vec4<f32>;
+@group(2) @binding(9) var<uniform> deep_color: vec4<f32>;
+@group(2) @binding(10) var<uniform> shallow_color: vec4<f32>;
+@group(2) @binding(11) var<uniform> fresnel_params: vec4<f32>;
+@group(2) @binding(12) var<uniform> sky_color: vec4<f32>;
+@group(2) @binding(13) var env_cubemap: texture_cube<f32>;
+@group(2) @binding(14) var env_sampler: sampler;
 
 struct Vertex {
     @builtin(instance_index) instance_index: u32,
@@ -52,94 +46,108 @@ struct VertexOutput {
 const PI: f32 = 3.14159265359;
 const GRAVITY: f32 = 9.81;
 
-// Calculate wave number k = 2π / wavelength
+// Calculate wave number k = 2pi / wavelength
 fn wave_number(wavelength: f32) -> f32 {
     return 2.0 * PI / wavelength;
 }
 
-// Calculate angular frequency ω = sqrt(g * k) * speed
+// Calculate angular frequency omega = sqrt(g * k) * speed
 fn angular_frequency(k: f32, speed: f32) -> f32 {
     return sqrt(GRAVITY * k) * speed;
 }
 
-// Evaluate a single Gerstner wave
-// Returns: xyz = position offset
+// Evaluate a single Gerstner wave position offset
 fn evaluate_gerstner_position(
-    wave: GerstnerWave,
+    direction: vec2<f32>,
+    steepness: f32,
+    wavelength: f32,
+    amplitude: f32,
+    speed: f32,
     world_xz: vec2<f32>,
     time: f32
 ) -> vec3<f32> {
-    let d = wave.direction.xy;
-    let steepness = wave.params.x;
-    let wavelength = wave.params.y;
-    let amplitude = wave.params.z;
-    let speed = wave.params.w;
-    
     let k = wave_number(wavelength);
     let omega = angular_frequency(k, speed);
     
-    let phase = k * dot(d, world_xz) - omega * time;
+    let phase = k * dot(direction, world_xz) - omega * time;
     let cos_phase = cos(phase);
     let sin_phase = sin(phase);
     
-    let q = steepness;
-    let a = amplitude;
-    
     return vec3<f32>(
-        q * a * d.x * cos_phase,
-        a * sin_phase,
-        q * a * d.y * cos_phase
+        steepness * amplitude * direction.x * cos_phase,
+        amplitude * sin_phase,
+        steepness * amplitude * direction.y * cos_phase
     );
 }
 
-// Evaluate Gerstner wave normal contribution
-// Returns binormal and tangent modifications for this wave
+// Evaluate Gerstner wave tangent frame contribution
+// Returns binormal and tangent modifications
 fn evaluate_gerstner_tangent_frame(
-    wave: GerstnerWave,
+    direction: vec2<f32>,
+    steepness: f32,
+    wavelength: f32,
+    amplitude: f32,
+    speed: f32,
     world_xz: vec2<f32>,
     time: f32
 ) -> mat2x3<f32> {
-    let d = wave.direction.xy;
-    let steepness = wave.params.x;
-    let wavelength = wave.params.y;
-    let amplitude = wave.params.z;
-    let speed = wave.params.w;
-    
     let k = wave_number(wavelength);
     let omega = angular_frequency(k, speed);
     
-    let phase = k * dot(d, world_xz) - omega * time;
+    let phase = k * dot(direction, world_xz) - omega * time;
     let cos_phase = cos(phase);
     let sin_phase = sin(phase);
     
-    let q = steepness;
     let wa = k * amplitude;
-    let s = sin_phase;
-    let c = cos_phase;
     
     // Binormal modification
     let b = vec3<f32>(
-        -q * d.x * d.x * wa * s,
-        d.x * wa * c,
-        -q * d.x * d.y * wa * s
+        -steepness * direction.x * direction.x * wa * sin_phase,
+        direction.x * wa * cos_phase,
+        -steepness * direction.x * direction.y * wa * sin_phase
     );
     
     // Tangent modification
     let t = vec3<f32>(
-        -q * d.x * d.y * wa * s,
-        d.y * wa * c,
-        -q * d.y * d.y * wa * s
+        -steepness * direction.x * direction.y * wa * sin_phase,
+        direction.y * wa * cos_phase,
+        -steepness * direction.y * direction.y * wa * sin_phase
     );
     
     return mat2x3<f32>(b, t);
+}
+
+// Helper to process one wave
+fn process_wave(
+    direction: vec4<f32>,
+    params: vec4<f32>,
+    base_xz: vec2<f32>,
+    time: f32,
+    offset: ptr<function, vec3<f32>>,
+    binormal: ptr<function, vec3<f32>>,
+    tangent: ptr<function, vec3<f32>>
+) {
+    let d = direction.xy;
+    let steepness = params.x;
+    let wavelength = params.y;
+    let amplitude = params.z;
+    let speed = params.w;
+    
+    // Skip waves with zero amplitude
+    if amplitude > 0.001 {
+        *offset = *offset + evaluate_gerstner_position(d, steepness, wavelength, amplitude, speed, base_xz, time);
+        let frame_mod = evaluate_gerstner_tangent_frame(d, steepness, wavelength, amplitude, speed, base_xz, time);
+        *binormal = *binormal + frame_mod[0];
+        *tangent = *tangent + frame_mod[1];
+    }
 }
 
 @vertex
 fn vertex(vertex: Vertex) -> VertexOutput {
     var out: VertexOutput;
     
-    let time = ocean.time_and_config.x;
-    let wave_count = u32(ocean.time_and_config.y);
+    let time = time_and_config.x;
+    let wave_count = u32(time_and_config.y);
     
     // Start with base position
     var world_pos = vertex.position;
@@ -150,17 +158,18 @@ fn vertex(vertex: Vertex) -> VertexOutput {
     var binormal = vec3<f32>(1.0, 0.0, 0.0);
     var tangent = vec3<f32>(0.0, 0.0, 1.0);
     
-    for (var i = 0u; i < wave_count; i = i + 1u) {
-        let wave = ocean.waves[i];
-        
-        // Skip waves with zero amplitude
-        if wave.params.z > 0.001 {
-            total_offset = total_offset + evaluate_gerstner_position(wave, base_xz, time);
-            
-            let frame_mod = evaluate_gerstner_tangent_frame(wave, base_xz, time);
-            binormal = binormal + frame_mod[0];
-            tangent = tangent + frame_mod[1];
-        }
+    // Process each wave (unrolled since we can't use arrays)
+    if wave_count >= 1u {
+        process_wave(wave0_direction, wave0_params, base_xz, time, &total_offset, &binormal, &tangent);
+    }
+    if wave_count >= 2u {
+        process_wave(wave1_direction, wave1_params, base_xz, time, &total_offset, &binormal, &tangent);
+    }
+    if wave_count >= 3u {
+        process_wave(wave2_direction, wave2_params, base_xz, time, &total_offset, &binormal, &tangent);
+    }
+    if wave_count >= 4u {
+        process_wave(wave3_direction, wave3_params, base_xz, time, &total_offset, &binormal, &tangent);
     }
     
     // Apply displacement
@@ -195,9 +204,9 @@ fn fragment(in: VertexOutput) -> @location(0) vec4<f32> {
     
     // Fresnel calculation - how much reflection vs water color
     let n_dot_v = max(dot(n, view_dir), 0.0);
-    let f0 = ocean.fresnel_params.x;
-    let power = ocean.fresnel_params.y;
-    let bias = ocean.fresnel_params.z;
+    let f0 = fresnel_params.x;
+    let power = fresnel_params.y;
+    let bias = fresnel_params.z;
     let fresnel = fresnel_schlick(n_dot_v, f0, power, bias);
     
     // Basic diffuse lighting
@@ -205,7 +214,7 @@ fn fragment(in: VertexOutput) -> @location(0) vec4<f32> {
     
     // Blend between deep and shallow based on view angle
     // Water appears darker (deep) when viewed from above, lighter (shallow) at grazing angles
-    let water_color = mix(ocean.deep_color.rgb, ocean.shallow_color.rgb, 1.0 - n_dot_v);
+    let water_color = mix(deep_color.rgb, shallow_color.rgb, 1.0 - n_dot_v);
     
     // Apply lighting to water color
     let ambient = 0.3;
@@ -215,7 +224,7 @@ fn fragment(in: VertexOutput) -> @location(0) vec4<f32> {
     let reflect_dir = reflect(-view_dir, n);
     
     // Check if we should use environment map
-    let use_env_map = ocean.time_and_config.z > 0.5;
+    let use_env_map = time_and_config.z > 0.5;
     
     var sky_reflection: vec3<f32>;
     if use_env_map {
@@ -227,7 +236,7 @@ fn fragment(in: VertexOutput) -> @location(0) vec4<f32> {
     } else {
         // Fallback to solid sky color with specular
         let spec = pow(max(dot(reflect_dir, light_dir), 0.0), 64.0);
-        sky_reflection = ocean.sky_color.rgb + spec * 0.5;
+        sky_reflection = sky_color.rgb + spec * 0.5;
     }
     
     // Blend water color and reflection based on Fresnel term
