@@ -11,26 +11,8 @@ license = "MIT"
 [workspace.dependencies]
 anyhow = "1.0"
 
-bevy = { version = "0.18", default-features = false, features = [
-	"bevy_asset",
-	"bevy_core_pipeline",
-	"bevy_gizmos",
-	"bevy_gltf",
-	"bevy_log",
-	"bevy_pbr",
-	"bevy_render",
-	"bevy_scene",
-	"bevy_state",
-	"bevy_winit",
-	"hdr",
-	"jpeg",
-	"multi_threaded",
-	"png",
-	"tonemapping_luts",
-	"x11",
-	"wayland",
-	"zstd_rust",
-] }
+# default = ["2d", "3d", "ui"] includes: rendering, pbr, gltf, audio, scenes, etc.
+bevy = { version = "0.18", features = ["wayland"] }
 clap = { version = "4", features = ["derive"] }
 crossbeam-channel = "0.5"
 image = "0.25"
