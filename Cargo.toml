@@ -11,26 +11,21 @@ license = "MIT"
 [workspace.dependencies]
 anyhow = "1.0"
 
-# Bevy (bleeding edge)
-bevy = { git = "https://github.com/bevyengine/bevy.git", default-features = false, features = [
+bevy = { version = "0.18", default-features = false, features = [
 	"bevy_asset",
-	"bevy_camera",
-	"bevy_color",
 	"bevy_core_pipeline",
 	"bevy_gizmos",
 	"bevy_gltf",
 	"bevy_log",
-	"bevy_mesh",
 	"bevy_pbr",
 	"bevy_render",
 	"bevy_scene",
 	"bevy_state",
-	"bevy_window",
 	"bevy_winit",
 	"hdr",
+	"jpeg",
 	"multi_threaded",
 	"png",
-	"reflect_auto_register",
 	"tonemapping_luts",
 	"x11",
 	"wayland",
