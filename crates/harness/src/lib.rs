@@ -19,7 +19,7 @@ pub use config::{CliArgs, ScreenshotConfig};
 pub use headless::{default_example_plugins, headless_runner};
 pub use plugin::{HarnessCameraReady, ScreenshotHarnessPlugin};
 pub use presets::{
-    CameraPreset, DETAIL_PRESETS, MIN_CAMERA_HEIGHT, SIMPLE_PRESETS, STANDARD_PRESETS,
+	CameraPreset, DETAIL_PRESETS, MIN_CAMERA_HEIGHT, SIMPLE_PRESETS, STANDARD_PRESETS,
 };
 pub use state::{ScreenshotPhase, ScreenshotState};
 pub use systems::{MainCamera, setup_camera};

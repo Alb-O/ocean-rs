@@ -13,46 +13,46 @@ pub const SETTLE_FRAMES: u32 = 30;
 /// Current state of the screenshot sequence
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ScreenshotPhase {
-    /// Waiting for initial scene render
-    Init(u32),
-    /// Settling before capture
-    Settling(u32),
-    /// Ready to capture
-    Capturing,
-    /// All done
-    Done,
+	/// Waiting for initial scene render
+	Init(u32),
+	/// Settling before capture
+	Settling(u32),
+	/// Ready to capture
+	Capturing,
+	/// All done
+	Done,
 }
 
 impl Default for ScreenshotPhase {
-    fn default() -> Self {
-        Self::Init(PRE_ROLL_FRAMES)
-    }
+	fn default() -> Self {
+		Self::Init(PRE_ROLL_FRAMES)
+	}
 }
 
 /// Screenshot state resource
 #[derive(Resource)]
 pub struct ScreenshotState {
-    pub phase: ScreenshotPhase,
-    pub current_preset: usize,
-    pub session_dir: String,
-    pub captured_paths: Vec<String>,
-    pub render_target: Option<Handle<Image>>,
+	pub phase: ScreenshotPhase,
+	pub current_preset: usize,
+	pub session_dir: String,
+	pub captured_paths: Vec<String>,
+	pub render_target: Option<Handle<Image>>,
 }
 
 impl Default for ScreenshotState {
-    fn default() -> Self {
-        let session_dir = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .unwrap_or_default()
-            .as_millis()
-            .to_string();
+	fn default() -> Self {
+		let session_dir = SystemTime::now()
+			.duration_since(UNIX_EPOCH)
+			.unwrap_or_default()
+			.as_millis()
+			.to_string();
 
-        Self {
-            phase: ScreenshotPhase::default(),
-            current_preset: 0,
-            session_dir,
-            captured_paths: Vec::new(),
-            render_target: None,
-        }
-    }
+		Self {
+			phase: ScreenshotPhase::default(),
+			current_preset: 0,
+			session_dir,
+			captured_paths: Vec::new(),
+			render_target: None,
+		}
+	}
 }
