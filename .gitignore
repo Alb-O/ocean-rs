@@ -3,3 +3,4 @@ target/
 /result
 **/tmp/
 *.sock
+output/

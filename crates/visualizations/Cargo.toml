@@ -7,8 +7,7 @@ publish = false
 
 [dependencies]
 bevy.workspace = true
-crossbeam-channel.workspace = true
-image.workspace = true
+bevy-screenshot-harness = { path = "../harness" }
 ocean-core = { path = "../core" }
 
 [[example]]
