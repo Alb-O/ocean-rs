@@ -8,22 +8,6 @@ publish = false
 [dependencies]
 bevy.workspace = true
 bevy-screenshot-harness = { path = "../harness" }
-ocean-core = { path = "../core" }
 
 [[example]]
 name = "cube"
-
-[[example]]
-name = "01_flat_ocean"
-
-[[example]]
-name = "02_gerstner_single"
-
-[[example]]
-name = "03_gerstner_multi"
-
-[[example]]
-name = "04_fresnel"
-
-[[example]]
-name = "05_skybox_reflect"
