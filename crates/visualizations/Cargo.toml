@@ -9,8 +9,5 @@ publish = false
 bevy.workspace = true
 bevy-screenshot-harness = { path = "../harness" }
 
-[lints]
-workspace = true
-
 [[example]]
 name = "cube"
