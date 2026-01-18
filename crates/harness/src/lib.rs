@@ -5,6 +5,10 @@
 
 #![allow(dead_code)]
 
+// Used in submodules, suppress false positive from unused_crate_dependencies lint
+use image as _;
+use tracing_subscriber as _;
+
 mod cleanup;
 mod config;
 mod headless;
