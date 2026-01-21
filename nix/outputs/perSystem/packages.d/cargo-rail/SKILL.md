@@ -168,6 +168,5 @@ See [full reference](references/config.md).
 
 ## References
 
-- [Command Reference](references/commands.md)
 - [Config Reference](references/config.md)
 - [Migration Guide](references/migrate-hakari.md)

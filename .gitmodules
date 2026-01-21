@@ -1,0 +1,3 @@
+[submodule "nix/outputs/perSystem/packages.d/cargo-rail"]
+	path = nix/outputs/perSystem/packages.d/cargo-rail
+	url = https://github.com/Alb-O/agentskill-cargo-rail

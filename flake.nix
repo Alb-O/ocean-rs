@@ -4,6 +4,9 @@
 {
   description = "@project_name@";
   inputs = {
+    # Enable git submodules
+    self.submodules = true;
+
     # Core inputs
     flake-parts.url = "github:hercules-ci/flake-parts";
     imp.url = "github:imp-nix/imp-nix";
@@ -13,8 +16,6 @@
     # Collected from __inputs
     rust-overlay.url = "github:oxalica/rust-overlay";
     rust-overlay.inputs.nixpkgs.follows = "nixpkgs";
-    treefmt-nix.url = "github:numtide/treefmt-nix";
-    treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
   };
   outputs = inputs: import ./nix/flake inputs;
 }
