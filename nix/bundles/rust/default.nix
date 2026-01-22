@@ -15,19 +15,21 @@
     _:
     {
       pkgs,
+      inputs,
       rootSrc,
       ...
     }:
     let
+      rustPkgs = pkgs.extend inputs.rust-overlay.overlays.default;
       cargoToml = fromTOML (builtins.readFile (rootSrc + "/Cargo.toml"));
       pname = cargoToml.package.name or (baseNameOf rootSrc);
       version = cargoToml.workspace.package.version or cargoToml.package.version;
       toolchainFile = rootSrc + "/rust-toolchain.toml";
       rustToolchain =
         if builtins.pathExists toolchainFile then
-          pkgs.rust-bin.fromRustupToolchainFile toolchainFile
+          rustPkgs.rust-bin.fromRustupToolchainFile toolchainFile
         else
-          pkgs.rust-bin.nightly."2026-01-21".default;
+          rustPkgs.rust-bin.nightly."2026-01-21".default;
       rustPlatform = pkgs.makeRustPlatform {
         cargo = rustToolchain;
         rustc = rustToolchain;
@@ -75,6 +77,7 @@
           rustToolchain
           pkgs.rust-analyzer
           pkgs.cargo-watch
+          pkgs.cargo-edit
         ];
       };
 

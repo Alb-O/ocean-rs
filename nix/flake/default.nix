@@ -15,16 +15,6 @@ flake-parts.lib.mkFlake { inherit inputs; } {
 
   systems = import inputs.systems;
 
-  # Apply rust-overlay to pkgs for all perSystem modules
-  perSystem =
-    { system, ... }:
-    {
-      _module.args.pkgs = import nixpkgs {
-        inherit system;
-        overlays = [ inputs.rust-overlay.overlays.default ];
-      };
-    };
-
   # imp configuration
   imp = {
     src = ../outputs;
@@ -34,7 +24,6 @@ flake-parts.lib.mkFlake { inherit inputs; } {
     args = {
       inherit nixpkgs;
       rootSrc = ../..;
-      rust-overlay = inputs.rust-overlay;
     };
 
     # Disable exports (not used in this project)
@@ -48,7 +37,6 @@ flake-parts.lib.mkFlake { inherit inputs; } {
       enable = true;
       coreInputs = import ./inputs.nix;
       description = "@project_name@";
-      outputsFile = "./nix/flake";
     };
   };
 }
