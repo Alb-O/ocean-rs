@@ -4,7 +4,6 @@ use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 
 use bevy::prelude::*;
-use bevy::render::RenderApp;
 use bevy::render::render_asset::RenderAssets;
 use bevy::render::render_graph::{
 	self, NodeRunError, RenderGraph, RenderGraphContext, RenderLabel,
@@ -14,7 +13,7 @@ use bevy::render::render_resource::{
 	TexelCopyBufferInfo, TexelCopyBufferLayout,
 };
 use bevy::render::renderer::{RenderContext, RenderDevice, RenderQueue};
-use bevy::render::{Extract, Render, RenderSystems};
+use bevy::render::{Extract, Render, RenderApp, RenderSystems};
 use crossbeam_channel::{Receiver, Sender};
 
 /// Channel receiver for image data from render world
