@@ -4,10 +4,10 @@ If you're using `cargo-hakari` or a workspace hack crate, migration takes about 
 
 ## Why migrate?
 
-- **No more meta-crate** cluttering your workspace
-- **Single config file** instead of hakari.toml + workspace-hack crate
-- **Resolution-based** - uses Cargo's actual resolver output
-- **Multi-target aware** - computes intersections across all your target triples
+- No more meta-crate cluttering your workspace
+- Single config file instead of hakari.toml + workspace-hack crate
+- Resolution-based - uses Cargo's actual resolver output
+- Multi-target aware - computes intersections across all your target triples
 
 ## Steps
 

@@ -6,10 +6,10 @@
 
 cargo-rail uses `rail.toml` for workspace-level configuration. This file controls:
 
-- **Dependency unification** (`cargo rail unify`)
-- **Release automation** (`cargo rail release`)
-- **Change detection** (`cargo rail affected`)
-- **Crate splitting** (`cargo rail split`)
+- Dependency unification (`cargo rail unify`)
+- Release automation (`cargo rail release`)
+- Change detection (`cargo rail affected`)
+- Crate splitting (`cargo rail split`)
 
 ### Configuration File Location
 
@@ -82,7 +82,7 @@ Configuration options at the workspace root level.
 | `change-detection` | `table` | `{}` | Change detection settings (see below) |
 | `crates` | `table` | `{}` | Per-crate configuration (see below) |
 
-**Example:**
+Example:
 
 ```toml
 targets = [
@@ -114,7 +114,7 @@ Controls workspace dependency unification behavior. All options are optional wit
 | `skip_undeclared_patterns` | `string[]` | `["default", "std", "alloc", "*_backend", "*_impl"]` | Patterns for features to skip in undeclared feature detection. Supports glob patterns. Default patterns filter out features that are typically not actionable (standard library features, internal implementation details). |
 | `max_backups` | `usize` | `3` | Maximum number of backup archives to keep. Older backups are automatically cleaned up after successful operations. Set to `0` to disable backup creation entirely. |
 
-**Example:**
+Example:
 
 ```toml
 [unify]
@@ -139,7 +139,7 @@ max_backups = 5
 | `exact_pin_handling` | `enum` | `"warn"` | How to handle exact version pins like `=0.8.0`:<br>• `"skip"` - Exclude exact-pinned deps from unification<br>• `"preserve"` - Keep the exact pin operator in workspace.dependencies<br>• `"warn"` - Convert to caret (`^`) but emit a warning |
 | `major_version_conflict` | `enum` | `"warn"` | How to handle major version conflicts (e.g., `serde = "1.0"` and `serde = "2.0"`):<br>• `"warn"` - Skip unification, emit warning (both versions stay in graph)<br>• `"bump"` - Force unify to highest resolved version (may break code) |
 
-**Example:**
+Example:
 
 ```toml
 [unify]
@@ -148,7 +148,7 @@ exact_pin_handling = "preserve"
 major_version_conflict = "bump"
 ```
 
-**Notes:**
+Notes:
 
 - In my experience, `major_version_conflict = "bump"` works in most cases; some may require code fixes
 - Use `"warn"` for safety, `"bump"` for the leanest build graph
@@ -163,7 +163,7 @@ major_version_conflict = "bump"
 | `exclude` | `string[]` | `[]` | Dependencies to skip from unification (safety hatch). Useful for platform-specific or problematic dependencies. |
 | `include` | `string[]` | `[]` | Force-include specific dependencies in unification, even if they're single-use. |
 
-**Example:**
+Example:
 
 ```toml
 [unify]
@@ -182,7 +182,7 @@ Advanced feature for replacing workspace-hack crates. Only enable if you current
 | `pin_transitives` | `bool` | `false` | Pin transitive-only dependencies with fragmented features. This is cargo-rail's workspace-hack replacement. When enabled, transitive deps with multiple feature sets are pinned in `workspace.dependencies`. |
 | `transitive_host` | `string` | `"root"` | Where to put pinned transitive dev-dependencies:<br>• `"root"` - Use workspace root `Cargo.toml`<br>• `"crates/foo"` - Use specific member crate (relative path from workspace root) |
 
-**Example:**
+Example:
 
 ```toml
 [unify]
@@ -190,7 +190,7 @@ pin_transitives = true
 transitive_host = "root"
 ```
 
-**Complete Example:**
+Complete Example:
 
 ```toml
 [unify]
@@ -237,7 +237,7 @@ Release automation settings for versioning, tagging, and publishing.
 | `create_github_release` | `bool` | `false` | Automatically create GitHub releases via `gh` CLI after tagging. Requires `gh` to be installed and authenticated. |
 | `sign_tags` | `bool` | `false` | Sign git tags with GPG or SSH. Requires git signing to be configured. |
 
-**Example:**
+Example:
 
 ```toml
 [release]
@@ -258,7 +258,7 @@ sign_tags = true
 | `skip_changelog_for` | `string[]` | `[]` | Crate names that should not generate changelog entries. |
 | `require_changelog_entries` | `bool` | `false` | If `true`, error when there are no changelog entries for a crate being released. |
 
-**Example:**
+Example:
 
 ```toml
 [release]
@@ -268,7 +268,7 @@ skip_changelog_for = ["internal-utils"]
 require_changelog_entries = true
 ```
 
-**Complete Example:**
+Complete Example:
 
 ```toml
 [release]
@@ -287,7 +287,7 @@ skip_changelog_for = []
 require_changelog_entries = false
 ```
 
-**Notes:**
+Notes:
 
 - In monorepos, use `{crate}` in `tag_format` to avoid tag collisions
 - For single-crate workspaces, use `tag_format = "v{version}"`
@@ -304,7 +304,7 @@ Settings for the `affected` and `test` commands. Controls how changes are classi
 | `infrastructure` | `string[]` | see below | Glob patterns for infrastructure files that trigger `rebuild_all` when modified. Changes to these files require testing all crates. |
 | `custom` | `table<string, string[]>` | `{}` | Custom path patterns and their categories. Keys are category names, values are glob pattern arrays. Used for conditional CI logic. |
 
-**Default Infrastructure Patterns:**
+Default Infrastructure Patterns:
 
 ```toml
 infrastructure = [
@@ -326,7 +326,7 @@ infrastructure = [
 ]
 ```
 
-**Example:**
+Example:
 
 ```toml
 [change-detection]
@@ -364,7 +364,7 @@ Use [`loadingalias/cargo-rail-action`](https://github.com/loadingalias/cargo-rai
     fi
 ```
 
-**Action Outputs:**
+Action Outputs:
 
 | Output | Description |
 |--------|-------------|
@@ -376,7 +376,7 @@ Use [`loadingalias/cargo-rail-action`](https://github.com/loadingalias/cargo-rai
 | `count` | Number of affected crates |
 | `custom-categories` | JSON object of custom category matches |
 
-**Conditional Jobs with Custom Categories:**
+Conditional Jobs with Custom Categories:
 
 ```yaml
 jobs:
@@ -431,7 +431,7 @@ Crate splitting and syncing configuration. Enables extracting crates to separate
 | `include` | `string[]` | no | Additional files/directories to include in the split (e.g., `["LICENSE", "README.md"]`) |
 | `exclude` | `string[]` | no | Files/directories to exclude from the split |
 
-**Choosing a Mode:**
+Choosing a Mode:
 
 | Scenario | Mode | Result |
 |----------|------|--------|
@@ -439,7 +439,7 @@ Crate splitting and syncing configuration. Enables extracting crates to separate
 | Group related utility crates | `combined` + `standalone` | Preserves directory structure, independent crates |
 | Extract as sub-workspace | `combined` + `workspace` | Root Cargo.toml with `[workspace]` |
 
-**Single Crate Example:**
+Single Crate Example:
 
 ```toml
 [crates.my-lib.split]
@@ -453,7 +453,7 @@ include = ["LICENSE", "README.md"]
 exclude = ["*.tmp"]
 ```
 
-**Combined Workspace Example:**
+Combined Workspace Example:
 
 ```toml
 [crates.utils.split]
@@ -469,7 +469,7 @@ paths = [
 include = ["LICENSE"]
 ```
 
-**Local Testing:**
+Local Testing:
 
 ```toml
 [crates.test-crate.split]
@@ -487,7 +487,7 @@ Per-crate release configuration. Overrides workspace-level release defaults.
 |--------|------|---------|-------------|
 | `publish` | `bool` | `true` | Enable/disable publishing for this crate. Overrides `Cargo.toml` `publish` field. |
 
-**Example:**
+Example:
 
 ```toml
 [crates.internal-utils.release]
@@ -503,7 +503,7 @@ Per-crate changelog configuration.
 | `path` | `PathBuf` | | Custom changelog path for this crate. Overrides workspace-level `changelog_path`. Interpreted according to `release.changelog_relative_to`. |
 | `skip` | `bool` | `false` | Exclude this crate from changelog generation entirely. |
 
-**Example:**
+Example:
 
 ```toml
 [crates.my-lib.changelog]
@@ -524,11 +524,11 @@ cargo rail sync my-lib --to-remote    # Monorepo → split repo
 cargo rail sync my-lib --from-remote  # Split repo → monorepo (PR branch)
 ```
 
-**Key behaviors:**
+Key behaviors:
 
-- **Idempotent**: Uses git-notes to track synced commits; re-running only processes new commits
-- **PR branch protection**: `--from-remote` creates `cargo-rail-sync-<crate>` branch, never commits to main
-- **Conflict resolution**: `--strategy` controls merge behavior (`manual`, `ours`, `theirs`, `union`)
+- Idempotent: Uses git-notes to track synced commits; re-running only processes new commits
+- PR branch protection: `--from-remote` creates `cargo-rail-sync-<crate>` branch, never commits to main
+- Conflict resolution: `--strategy` controls merge behavior (`manual`, `ours`, `theirs`, `union`)
 
 ---
 
@@ -769,17 +769,17 @@ cargo rail config validate -f json      # JSON output for CI integration
 
 ### What Gets Validated
 
-1. **Syntax** - TOML parse errors with line/column information
-2. **Unknown keys** - Typos like `mrsv_source` instead of `msrv_source`
-3. **Semantic validation** - Split config requirements, target triple formats
-4. **Deprecation warnings** - Future-proofing for config migrations
+1. Syntax - TOML parse errors with line/column information
+2. Unknown keys - Typos like `mrsv_source` instead of `msrv_source`
+3. Semantic validation - Split config requirements, target triple formats
+4. Deprecation warnings - Future-proofing for config migrations
 
 ### CI Auto-Strict Mode
 
-By default, validation runs in **strict mode** when CI is detected (via `CI`, `GITHUB_ACTIONS`, `GITLAB_CI`, or `CIRCLECI` environment variables):
+By default, validation runs in strict mode when CI is detected (via `CI`, `GITHUB_ACTIONS`, `GITLAB_CI`, or `CIRCLECI` environment variables):
 
-- **In CI**: Unknown keys and other warnings become errors (exit code 2)
-- **Locally**: Unknown keys are warnings only
+- In CI: Unknown keys and other warnings become errors (exit code 2)
+- Locally: Unknown keys are warnings only
 
 Override with `--strict` or `--no-strict` flags.
 

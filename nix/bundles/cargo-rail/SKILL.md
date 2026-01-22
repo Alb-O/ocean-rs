@@ -11,23 +11,23 @@ Graph-aware monorepo orchestration for Rust workspaces.
 
 | Problem | Before | After |
 |---------|--------|-------|
-| **Build graph drift** | `cargo-hakari`, workspace-hack crates | `cargo rail unify` |
-| **Unused deps** | `cargo-udeps`, `cargo-machete`, `cargo-shear` | `cargo rail unify` |
-| **Dead features** | `cargo-features-manager`, manual audit | `cargo rail unify` |
-| **MSRV computation** | `cargo-msrv`, compile-and-fail loops | `cargo rail unify` |
-| **CI waste** | `paths-filter` + shell scripts | `cargo rail affected` |
-| **CI costs** | Test everything, bill for everything | Test what changed |
-| **Crate extraction** | `git subtree`, `git-filter-repo`, Google's Copybara | `cargo rail split` |
-| **Release orchestration** | `release-plz`, `cargo-release`, `git-cliff` | `cargo rail release` |
+| Build graph drift | cargo-hakari, workspace-hack crates | `cargo rail unify` |
+| Unused deps | cargo-udeps, cargo-machete, cargo-shear | `cargo rail unify` |
+| Dead features | cargo-features-manager, manual audit | `cargo rail unify` |
+| MSRV computation | cargo-msrv, compile-and-fail loops | `cargo rail unify` |
+| CI waste | paths-filter + shell scripts | `cargo rail affected` |
+| CI costs | Test everything, bill for everything | Test what changed |
+| Crate extraction | git subtree, git-filter-repo, Google's Copybara | `cargo rail split` |
+| Release orchestration | release-plz, cargo-release, git-cliff | `cargo rail release` |
 
-**11 dependencies. One config file.**
+11 dependencies. One config file.
 
 ## MSRV policy
 
-- **MSRV source of truth**: `Cargo.toml` (`rust-version`, written as `major.minor.patch`)
-- **Cargo requirement**: Cargo shipped with that Rust release (newer Cargo is fine)
-- **CI**: builds on MSRV to prevent accidental bumps
-- **Workspaces**: `cargo rail unify` writes `[workspace.package].rust-version`; enable `[unify].enforce_msrv_inheritance = true` to set `[package].rust-version = { workspace = true }` in member crates
+- MSRV source of truth: `Cargo.toml` (`rust-version`, written as `major.minor.patch`)
+- Cargo requirement: Cargo shipped with that Rust release (newer Cargo is fine)
+- CI: builds on MSRV to prevent accidental bumps
+- Workspaces: `cargo rail unify` writes `[workspace.package].rust-version`; enable `[unify].enforce_msrv_inheritance = true` to set `[package].rust-version = { workspace = true }` in member crates
 
 ## Quick Start
 
@@ -52,7 +52,7 @@ cargo rail test                        # run tests for affected crates
 cargo rail test --explain              # show why each crate is affected
 ```
 
-**CI Integration:**
+CI Integration:
 
 ```yaml
 - uses: loadingalias/cargo-rail-action@v1
@@ -75,12 +75,12 @@ cargo rail unify undo       # restore from backup
 
 What it does:
 
-- **Unifies versions** — writes to `[workspace.dependencies]`, converts members to `workspace = true`
-- **Prunes dead features** — removes features never enabled in the resolved graph
-- **Fixes undeclared features** — adds missing feature declarations to member manifests
-- **Detects unused deps** — flags dependencies not used anywhere (auto-removes on apply)
-- **Computes MSRV** — derives minimum Rust version from dependency graph
-- **Pins transitives** — replaces `cargo-hakari` without a workspace-hack crate
+- Unifies versions — writes to `[workspace.dependencies]`, converts members to `workspace = true`
+- Prunes dead features — removes features never enabled in the resolved graph
+- Fixes undeclared features — adds missing feature declarations to member manifests
+- Detects unused deps — flags dependencies not used anywhere (auto-removes on apply)
+- Computes MSRV — derives minimum Rust version from dependency graph
+- Pins transitives — replaces cargo-hakari without a workspace-hack crate
 
 Multi-target aware: runs `cargo metadata` per target triple in parallel, computes feature *intersections* not unions.
 
@@ -98,7 +98,7 @@ cargo rail sync crate/s --to-remote   # push changes to split repo
 cargo rail sync crate/s --from-remote # pull changes (creates PR branch)
 ```
 
-**Three modes:**
+Three modes:
 
 - `single` — one crate → one repo (most common)
 - `combined` — multiple crates → one repo (shared utilities)
@@ -160,11 +160,11 @@ See [full reference](references/config.md).
 
 ## Notes
 
-- **vs cargo-hakari**: No workspace-hack crate. Writes directly to `[workspace.dependencies]`. Use `pin_transitives = true` for equivalent behavior.
-- **Workspace inheritance**: Yes. Converts members to `{ workspace = true }`.
-- **Virtual workspaces**: Supported. Auto-selects transitive host or configure explicitly.
-- **Private registries**: Works via `cargo metadata`, respects `.cargo/config.toml`.
-- **Undeclared features**: Detects when crates "borrow" features from siblings (works in workspace, breaks on publish). Auto-fixes by adding missing declarations.
+- vs cargo-hakari: No workspace-hack crate. Writes directly to `[workspace.dependencies]`. Use `pin_transitives = true` for equivalent behavior.
+- Workspace inheritance: Yes. Converts members to `{ workspace = true }`.
+- Virtual workspaces: Supported. Auto-selects transitive host or configure explicitly.
+- Private registries: Works via `cargo metadata`, respects `.cargo/config.toml`.
+- Undeclared features: Detects when crates "borrow" features from siblings (works in workspace, breaks on publish). Auto-fixes by adding missing declarations.
 
 ## References
 
