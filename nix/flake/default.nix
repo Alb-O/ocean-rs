@@ -28,6 +28,7 @@ flake-parts.lib.mkFlake { inherit inputs; } {
   # imp configuration
   imp = {
     src = ../outputs;
+    bundles.src = ../bundles;
 
     # Extra args available in all output files
     args = {
