@@ -40,6 +40,9 @@ flake-parts.lib.mkFlake { inherit inputs; } {
     # Disable exports (not used in this project)
     exports.enable = false;
 
+    # Auto-generate default devShell composing all bundle devShells
+    impShell.enable = true;
+
     # Auto-generate flake.nix from __inputs declarations
     flakeFile = {
       enable = true;

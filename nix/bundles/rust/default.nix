@@ -1,7 +1,8 @@
 /**
   Rust bundle: package, check, and formatter config.
 
-  Self-contained Rust tooling using rust-overlay for toolchain from rust-toolchain.toml.
+  Self-contained Rust tooling using rust-overlay.
+  Uses rust-toolchain.toml if present, otherwise defaults to pinned nightly.
   Formatter fragments merge with other formatter.d/ or __outputs.formatter contributions.
 */
 {
@@ -14,16 +15,19 @@
     _:
     {
       pkgs,
-      self',
-      rust-overlay,
       rootSrc,
       ...
     }:
     let
-      cargoToml = builtins.fromTOML (builtins.readFile (rootSrc + "/Cargo.toml"));
-      pname = cargoToml.package.name or (builtins.baseNameOf rootSrc);
+      cargoToml = fromTOML (builtins.readFile (rootSrc + "/Cargo.toml"));
+      pname = cargoToml.package.name or (baseNameOf rootSrc);
       version = cargoToml.workspace.package.version or cargoToml.package.version;
-      rustToolchain = pkgs.rust-bin.fromRustupToolchainFile (rootSrc + "/rust-toolchain.toml");
+      toolchainFile = rootSrc + "/rust-toolchain.toml";
+      rustToolchain =
+        if builtins.pathExists toolchainFile then
+          pkgs.rust-bin.fromRustupToolchainFile toolchainFile
+        else
+          pkgs.rust-bin.nightly."2026-01-21".default;
       rustPlatform = pkgs.makeRustPlatform {
         cargo = rustToolchain;
         rustc = rustToolchain;
@@ -62,6 +66,17 @@
         Runs tests via doCheck.
       */
       __outputs.perSystem.checks.rust = package;
+
+      /**
+        Rust development shell with toolchain and common tools.
+      */
+      __outputs.perSystem.devShells.rust = pkgs.mkShell {
+        packages = [
+          rustToolchain
+          pkgs.rust-analyzer
+          pkgs.cargo-watch
+        ];
+      };
 
       /**
         Formatter config fragment.

@@ -1,6 +1,11 @@
+/**
+  Bevy bundle: development environment for Bevy game engine.
+
+  Provides runtime dependencies for graphics, audio, windowing, and input.
+  Configures dynamic linking for faster compile times.
+*/
 { pkgs, ... }:
 let
-  # Bevy runtime dependencies
   bevyDeps = with pkgs; [
     # Graphics
     vulkan-loader
@@ -23,16 +28,19 @@ let
 
     # Input (gamepad support)
     udev
+
+    # Compilation
+    mold
+    clang
   ];
 in
 {
-  bevy = pkgs.mkShell {
+  __outputs.perSystem.devShells.bevy = pkgs.mkShell {
     packages = [ pkgs.pkg-config ] ++ bevyDeps;
 
     # Enable dynamic linking for faster compile times
     RUSTFLAGS = "-C linker=clang -C link-arg=-fuse-ld=mold";
 
-    # shellHook is inherited via inputsFrom
     shellHook = ''
       export LD_LIBRARY_PATH="${pkgs.lib.makeLibraryPath bevyDeps}:/run/opengl-driver/lib''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
     '';

@@ -4,7 +4,6 @@
 {
   description = "@project_name@";
   inputs = {
-    # Enable git submodules
     self.submodules = true;
 
     # Core inputs
