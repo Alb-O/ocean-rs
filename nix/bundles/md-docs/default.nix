@@ -1,26 +1,15 @@
 /**
-  Markdown formatter with GitHub Flavored Markdown support.
+  Markdown linter and formatter using rumdl.
 
-  Plugins:
-  - mdformat-gfm: Tables, task lists, strikethrough
-  - mdformat-frontmatter: YAML frontmatter preservation
-  - mdformat-footnote: Footnote syntax
+  A high-performance Markdown linter written in Rust.
+  Supports GFM, MkDocs, MDX, and Quarto flavors.
 */
 { pkgs, ... }:
-let
-  pkg = pkgs.mdformat.withPlugins (
-    ps: with ps; [
-      mdformat-gfm
-      mdformat-frontmatter
-      mdformat-footnote
-    ]
-  );
-in
 {
   __outputs.perSystem.formatter = {
-    settings.formatter.mdformat = {
-      command = pkgs.lib.getExe pkg;
-      options = [ "--number" ];
+    settings.formatter.rumdl = {
+      command = pkgs.lib.getExe pkgs.rumdl;
+      options = [ "fmt" ];
       includes = [ "*.md" ];
     };
   };
