@@ -15,5 +15,4 @@ exclude = [
   "target/",
   "result/",
   "refs/",  # Reference docs from external sources
-  "nix/bundles/cargo-rail/",  # External submodule with its own broken links
 ]
