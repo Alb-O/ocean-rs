@@ -1,16 +1,7 @@
-# rumdl configuration
-# https://rumdl.dev/global-settings
+# Project-specific rumdl config
+# Disabled rules (MD013, MD033, MD041) are handled by md-docs bundle
 
 [global]
-# Disable noisy rules
-disable = [
-  "MD013",  # Line length - not useful for docs with long URLs/code
-  "MD033",  # Inline HTML - needed for badges, alignment, etc.
-  "MD041",  # First line should be heading - not always applicable
-  # "MD057",  # Relative link checking - testing if it works in nix store
-]
-
-# Exclude generated/vendored content
 exclude = [
   "target/",
   "result/",
