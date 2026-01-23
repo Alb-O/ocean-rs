@@ -1,9 +1,0 @@
-# Project-specific rumdl config
-# Disabled rules (MD013, MD033, MD041) are handled by md-docs bundle
-
-[global]
-exclude = [
-  "target/",
-  "result/",
-  "refs/",  # Reference docs from external sources
-]

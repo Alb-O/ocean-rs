@@ -7,3 +7,6 @@
 [submodule "nix/bundles/bevy"]
 	path = nix/bundles/bevy
 	url = https://github.com/imp-nix/bundle.bevy
+[submodule "nix/bundles/md-docs"]
+	path = nix/bundles/md-docs
+	url = https://github.com/imp-nix/bundle.md-docs
