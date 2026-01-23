@@ -1,0 +1,18 @@
+# rumdl configuration
+# https://rumdl.dev/global-settings
+
+[global]
+# Disable noisy rules
+disable = [
+  "MD013",  # Line length - not useful for docs with long URLs/code
+  "MD033",  # Inline HTML - needed for badges, alignment, etc.
+  "MD041",  # First line should be heading - not always applicable
+  "MD057",  # Relative link checking - breaks in nix store context
+]
+
+# Exclude generated/vendored content
+exclude = [
+  "target/",
+  "result/",
+  "refs/",  # Reference docs from external sources
+]

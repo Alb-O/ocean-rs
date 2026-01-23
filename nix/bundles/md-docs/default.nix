@@ -4,7 +4,7 @@
   A high-performance Markdown linter written in Rust.
   Supports GFM, MkDocs, MDX, and Quarto flavors.
 */
-{ pkgs, ... }:
+{ pkgs, rootSrc, ... }:
 {
   __outputs.perSystem.formatter = {
     settings.formatter.rumdl = {
@@ -13,4 +13,9 @@
       includes = [ "*.md" ];
     };
   };
+
+  __outputs.perSystem.checks.markdown = pkgs.runCommand "rumdl-check" { } ''
+    cd ${rootSrc}
+    ${pkgs.lib.getExe pkgs.rumdl} check . && touch $out
+  '';
 }
