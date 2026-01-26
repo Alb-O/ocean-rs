@@ -10,3 +10,6 @@
 [submodule "nix/bundles/md-docs"]
 	path = nix/bundles/md-docs
 	url = https://github.com/imp-nix/bundle.md-docs
+[submodule "nix/bundles/imp-bundles"]
+	path = nix/bundles/imp-bundles
+	url = https://github.com/imp-nix/bundle.imp-bundles
